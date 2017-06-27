@@ -1,2 +1,10 @@
-# phaser-javascript
-PhaserでJavascriptを学ぶ
+# はじめに
+
+Phaserの紹介など
+
+
+
+## プログラミングの６つの肝！
+
+
+
