@@ -54,8 +54,84 @@ game.state.start('Boot');
 状態を管理するオブジェクトの例として、起動用の`Boot.js`を以下に示します。
 
 ```javascript
+// ゲームをまとめるオブジェクト
+var MyGame = {};
 
+// パラメーター
+MyGame.Boot = function (game) {
+}
+
+// 起動処理
+MyGame.Boot.prototype = {
+    // 準備
+    preload: function() {
+        this.load.baseURL = "../../assets";
+        this.load.crossOrigin = "anonymous";
+
+        this.load.image("star", "/images/star.png");
+    },
+
+    // 作成
+    create: function() {
+        // タイトルへ
+        this.state.start("Title");
+    }
+}
 ```
+
+`MyGame`などの見慣れないものが並んでいて、`preload`や`create`はファイルに分かれておらず、`{`と`}`の内側に、コンマ区切りで並べられています。また、`game`と書いていた部分が`this`に変わっています。
+
+### グローバルの変数を減らす
+ここまで使ってきたフレームワークでは、`dude`や`star`などの変数を、`var dude;`などのように定義していました。JavaScriptで`var`で定義した変数は、グローバル変数になり、どこからでも参照できるようになります。一目で見通せる程度の小さいプログラムであればそれで構いませんが、状態が切り替わるようなプログラムではグローバル変数の乱用は避けたいところです。
+
+そこでJavaScriptで利用するテクニックが、`MyGame`のようなオブジェクトを定義して、それに必要な変数や関数を持たせる方法です（実際には`MyGame`は、その作品のコード名に置き換えます）。これにより、グローバル変数を`MyGame`の1つだけにできます。
+
+### プロパティーとメソッドの定義
+オブジェクトは、変数にあたるプロパティと、関数にあたるメソッドを持つことができます。
+
+各状態に持たせたいプロパティーは、以下のように定義します。`MyGame.Boot`に`hensu`というプロパティーを定義する例です。
+
+```javascript
+// パラメーター
+MyGame.Boot = function (game) {
+    this.hensu = 0;
+}
+```
+
+オブジェクトに、先に利用した`preload`や`create`などのメソッドを定義して、State Managerに渡すことで、状態管理ができます。オブジェクトのメソッドは、`MyGame.Boot.prototype = {`から`}`までの間に定義します。形は、`<メソッド名>: function([引数リスト]) {・・・}`というもので、複数ある場合はコンマで区切ります。
+
+### thisの利用
+`this`は、現在実行しているオブジェクトのインスタンスを表します。Phaserの状態オブジェクトには、自動的に以下に示すような様々なPhaserのインスタンスが定義されます。
+
+|this.からアクセスできるオブジェクト|参照先|
+|:-|:-|
+|game|Phaser.Gameのインスタンス|
+|add|Phaser.GameObjectFactory|
+|make|Phaser.GameObjectCreator|
+|camera|Phaser.Camera|
+|cache|Phaser.Cache|
+|input|Phaser.Input|
+|load|Phaser.Loader|
+|math|Phaser.Math|
+|sound|Phaser.SoundManager|
+|scale|Phaser.ScaleManager|
+|state|Phaser.StateManager|
+|stage|Phaser.Stage|
+|time|Phaser.Time|
+|tweens|Phaser.TweenManager|
+|world|Phaser.World|
+|particles|Phaser.Particles|
+|rnd|Phaser.RandomDataGenerator|
+|physics|Phaser.Physics|
+|key|The string based state key|
+
+例えば、`this.load`で`Phaser.Loader`を利用できますので、`game.load.image()`を、`this.load.image()`に書き換えることができます。これにより、グローバル変数として`game`を定義しておく必要がなくなります。
+
+乱数は`this.rnd`で求められますし、Physicsは`this.physics`で操作できます。これからはこの書き方を使います。
+
+---
+
+
 
 ## 状態オブジェクトが持っているメソッド
 状態オブジェクトに以下のメソッドを用意すると、決まったタイミングでPhaserのシステムがそのメソッドを呼び出してくれます。
