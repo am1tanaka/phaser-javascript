@@ -3,9 +3,20 @@
 ## Phaserの状態管理(State Management)
 ゲームとして完成させることを考えてみます。プログラムを起動すると、まずはデータを読み込む起動画面が表示されて、次にタイトル画面が表示されて、画面をクリックするとゲームが開始して・・・といったように進行することが思い浮かびます。ゲームに限らず、アプリケーションの開発手法として、機能が異なる場面を<b>状態(State)</b>で分けて、ファイルを分割する方法がよく使われます。
 
-Phaserには、予め状態を分割して作成し、それを切り替える仕組み`State Manager`を持っています。ここでは`State Manager`の使い方を学び、これまで勉強で作ってきたものを、ゲームとして完成させます。
+Phaserは、予め状態を分割して作成し、それを切り替える仕組み`State Manager`を持っています。ここでは`State Manager`の使い方を学び、これまで勉強で作ってきたものをゲームとして完成させます。
 
 ## Phsaerでのシーンの構築方法
+ここまで使ってきたシンプルなプロジェクトは、1つの状態でした。`preload`でファイルを読み込み、`create`でゲームワールドを構築して、`update`でフレーム毎の更新処理をして、必要であれば`render`でデバッグメッセージを表示しました。このようなサイクルをまとめたものを状態(State)と呼びます。Unityでのシーン(Scene)がこれに該当します。
+
+Phaserで状態を複数持たせるには、以下のような手順を踏みます。
+
+1. 各状態のオブジェクトを作成して、その状態用の`preload`や`create`などのメソッドを定義する
+1. 作成した状態のオブジェクトを、Phaserの開始時に全てゲームに登録
+1. 最初の状態を開始(`start`)
+1. 必要に応じて、`start`を呼び出して、状態を切り替える
+
+以上です。これまで作ってきたプログラムを複数用意して、それを切り替えていくのです。
+
 ### 初期化
 Phaserでは、最初に`Phaser.Game`オブジェクトを生成します。小さいプロジェクトでは、以下のように生成と同時に`preload`や`create`といった処理を指定して、すぐにゲームを起動していました。
 
@@ -19,25 +30,28 @@ Phaserでは、最初に`Phaser.Game`オブジェクトを生成します。小�
 		});
 ```
 
-State Managerを利用する場合は、`preload`などは状態ごとに違うものを用意しますので、上記の時点では指定しません。以下のようなコードに変わります。
+`State Manager`を利用する場合は、`preload`などを状態ごとに用意します。そのため、この段階では個別に設定することはせず、以下のようなコードに変わります。
 
 ```javascript
+let 
+
 window.game = new Phaser.Game(640, 360, Phaser.AUTO, 'gameContainer');
 
 // 状態を登録する
+game.state.add('Boot', MyGame.Boot);
 game.state.add('Title', MyGame.Title);
 game.state.add('Game', MyGame.Game);
 game.state.add('GameOver', MyGame.GameOver);
 game.state.add('Clear', MyGame.Clear);
 
-// Titleを起動する
-game.state.start('Title');
+// 起動する
+game.state.start('Boot');
 ```
 
-以上で、タイトル、ゲーム、ゲームオーバー、クリアの4つの状態を追加して、それぞれの状態を`MyGame.Title`, `MyGame.Game`, `MyGame.GameOver`, `MyGame.Clear`というオブジェクトを対応付けます。
+以上で、タイトル、ゲーム、ゲームオーバー、クリアの4つの状態を追加して、それぞれの状態に`MyGame.Title`, `MyGame.Game`, `MyGame.GameOver`, `MyGame.Clear`というオブジェクトを対応付けます。そして、最初の状態を`Boot`にしてゲームを開始します。
 
 ### 各状態のオブジェクト
-状態を管理するオブジェクトとして、タイトル用の`Title.js`を以下に示します。
+状態を管理するオブジェクトの例として、起動用の`Boot.js`を以下に示します。
 
 ```javascript
 
