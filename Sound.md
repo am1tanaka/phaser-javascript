@@ -138,3 +138,21 @@ game.sound.stopAll();
 
 ちゃんと開発する場合は、前者の仕組みを用意するとよいでしょう。シンプルに作る場合は、後者で楽に実装する手もあります。
 
+# その他の情報
+## 音の準備完了を待つ
+音データは、ファイルから読み込みが完了しても、その後にデコード作業があるのですぐには再生できません。音の準備ができてからプログラムを開始させたい場合は、以下の記事が参考になります。
+
+- [William. Phaser Audio Delay](https://phasergames.com/phaser-audio-delay/)
+
+## Audioスプライト
+効果音などが多くなると、単体の音ファイルを読み込むのは効率が悪く、管理も面倒です。そこで、全ての音を結合して1つのファイルにして、音が始まる秒数と終わる秒数をマーカーで指定して、鳴らし分ける`Audio Sprite`機能が用意されています。
+
+1つの音声を読み込んで、秒数をプログラムで設定する例が、以下にあります。
+
+- [Phaser.io Audio Sprite(http://phaser.io/examples/v2/audio/audio-sprite)
+
+各音の秒数をJSON形式で用意する例が、以下にあります。
+
+- [Phaser.io Audio Sprite Json](http://phaser.io/examples/v2/audio/audio-sprite-json)
+
+最終的には、JSONを別ファイルに用意して、それを読み込んで利用することになるでしょう。
